@@ -1,0 +1,135 @@
+1.      The DevOps team would like to get the list of all Namespaces in the cluster. Get the list and save it to namespaces file. 
+
+Kubectl get namespace >> namespaces
+
+Cat namespaces 
+
+cat namespaces -Screen
+
+vi 
+
+2. Create a single Pod of image httpd:2.4.41-alpine in Namespace btu2. The Pod should be named pod1 and the container should be named pod1-container.
+
+Your manager would like to run a command manually on occasion to output the status of that exact Pod. Please write a command that does this into pod1-status-command.sh. The command should use kubectl.
+
+Kubectl run pod2 –image  httpd:2.4.41-alpine $do >pod.yml
+
+უნდა გახსნა შემდეგ ეს იამლ ფაილი და შეცვალო კონტეინერის სახელი და k apply -f ით გაუშვა
+
+k get pods -n btu2 - Screen
+
+sh pod1-status-command.sh – Screen
+
+kubectl describe pod pod1 | grep -I status
+
+ 
+
+3. Team Neptune needs a Job template located at job.yaml. This Job should run image busybox:1.31.0 and execute sleep 2 && echo done. It should be in namespace neptune, run a total of 3 times and should execute 2 runs in parallel. Start the Job and check its history. The job should be named neb-new-job and the container neb-new-job-container.
+
+k get jobs -n neptune – Screen
+
+apiVersion: batch/v1
+
+kind: Job
+
+metadata:
+
+  name: neb-new-job
+
+  namespace: neptune
+
+spec:
+
+  completions: 3
+
+  parallelism: 2
+
+  template:
+
+    metadata:
+
+      name: neb-new-job
+
+    spec:
+
+      containers:
+
+      - name: neb-new-job-container
+
+        image: busybox:1.31.0
+
+        command: ["sh", "-c", "sleep 2 && echo done"]
+
+      restartPolicy: Never
+
+ 
+
+4.Create a single Pod named pod4 in Namespace btu-4 of image busybox:1.31.0. The Pod should have a readiness-probe executing cat /tmp/ready. It should initially wait 5 and periodically wait 10 seconds. This will set the container ready only if the file /tmp/ready exists. The Pod should run the command touch /tmp/ready && sleep 1d, which will create the necessary file to be ready and then idles. Create the Pod and confirm it starts.
+
+apiVersion: v1
+
+kind: Pod
+
+metadata:
+
+  name: pod4
+
+  namespace: btu-4
+
+spec:
+
+  containers:
+
+  - name: container1
+
+    image: busybox:1.31.0
+
+    readinessProbe:
+
+      exec:
+
+        command:
+
+        - cat
+
+        - /tmp/ready
+
+      initialDelaySeconds: 5
+
+      periodSeconds: 10
+
+    command:
+
+    - "/bin/sh"
+
+    - "-c"
+
+    - "touch /tmp/ready && sleep 1d"
+
+k get pods -n btu-4 -Screen
+
+ 
+
+5. Create a new Secret secret1 in btu-5 namespace which contains user=test and pass=pwd.
+
+k get secret -n btu-5 – Screen
+
+apiVersion: v1
+
+kind: Secret
+
+metadata:
+
+  name: secret1
+
+  namespace: btu-5
+
+type: Opaque
+
+data:
+
+  user: dGVzdA==  # Base64 encoded value of 'test'
+
+  pass: cHdk      # Base64 encoded value of 'pwd'
+
+ 
